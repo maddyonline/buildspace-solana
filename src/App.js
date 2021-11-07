@@ -24,7 +24,7 @@ const App = () => {
     })
   }, [])
 
-
+  const connectWallet = async () => null;
   return (
     <div className="App">
       <div className="container">
@@ -33,6 +33,9 @@ const App = () => {
           <p className="sub-text">
             Aloha! let's build this!
           </p>
+          <button className="cta-button connect-wallet-button" onClick={connectWallet}>
+          Connect to Wallet
+          </button>
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
