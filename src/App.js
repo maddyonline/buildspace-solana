@@ -20,7 +20,7 @@ const App = () => {
           console.log("Phantom wallet found")
           const resp = await solana.connect()
           setWalletAddress(resp.publicKey.toString())
-          setMessage({type: "success", message: "Yay! you are connected!"});
+          setMessage({type: "success", message: `Yay! you are connected`});
       } else {
         setMessage({type: "error", message: "No Phantom wallet found"});
       }
@@ -38,6 +38,7 @@ const App = () => {
           <p className="sub-text">
             Aloha! let's build this!
           </p>
+          {walletAddress && <p style={{color: 'green'}}>{walletAddress}</p>}
           {message && <ShowResult />}
           {!walletAddress && <button className="cta-button connect-wallet-button" onClick={connectWallet}>
           Connect to Wallet
