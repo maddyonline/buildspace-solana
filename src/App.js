@@ -10,6 +10,8 @@ const checkIfWalletIsConnected = async () => {
     const {solana} = window;
     if(solana && solana.isPhantom) {
       console.log("Phantom wallet found")
+      const resp = await solana.connect({ onlyIfTrusted: true })
+      console.log(resp.publicKey.toString())
     } else {
       console.log("No Phantom wallet detected")
     }
