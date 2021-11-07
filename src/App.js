@@ -16,7 +16,10 @@ const checkIfWalletIsConnected = async () => {
       console.log("No Phantom wallet detected")
     }
 }
+
 const App = () => {
+
+  const [walletAddress, setWalletAddress] = React.useState(null);
   
   React.useEffect(() => {
     window.addEventListener('load', async () => {
@@ -24,7 +27,7 @@ const App = () => {
     })
   }, [])
 
-  const connectWallet = async () => null;
+  const connectWallet = async () => setWalletAddress("cool");
   return (
     <div className="App">
       <div className="container">
@@ -33,9 +36,9 @@ const App = () => {
           <p className="sub-text">
             Aloha! let's build this!
           </p>
-          <button className="cta-button connect-wallet-button" onClick={connectWallet}>
+          {!walletAddress && <button className="cta-button connect-wallet-button" onClick={connectWallet}>
           Connect to Wallet
-          </button>
+          </button>}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
