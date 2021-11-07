@@ -6,28 +6,30 @@ import React from 'react';
 const TWITTER_HANDLE = 'madhavjha';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
-const checkIfWalletIsConnected = async () => {
-    const {solana} = window;
-    if(solana && solana.isPhantom) {
-      console.log("Phantom wallet found")
-      const resp = await solana.connect({ onlyIfTrusted: true })
-      console.log(resp.publicKey.toString())
-    } else {
-      console.log("No Phantom wallet detected")
-    }
-}
+
 
 const App = () => {
 
   const [walletAddress, setWalletAddress] = React.useState(null);
-  
-  React.useEffect(() => {
-    window.addEventListener('load', async () => {
-      await checkIfWalletIsConnected();
-    })
-  }, [])
+  const [message, setMessage] = React.useState(null);
 
-  const connectWallet = async () => setWalletAddress("cool");
+  const connectWallet = async () => {
+    try {
+      const {solana} = window;
+      if(solana && solana.isPhantom) {
+          console.log("Phantom wallet found")
+          const resp = await solana.connect()
+          setWalletAddress(resp.publicKey.toString())
+          setMessage({type: "success", message: "Yay! you are connected!"});
+      } else {
+        setMessage({type: "error", message: "No Phantom wallet found"});
+      }
+    } catch(error) {
+      console.log(error);
+    }
+  }
+  const ShowResult = () => message && <p style={message.type === 'success' ? {color: 'green'}: {color: 'red'}}>{message.message}</p>
+
   return (
     <div className="App">
       <div className="container">
@@ -36,6 +38,7 @@ const App = () => {
           <p className="sub-text">
             Aloha! let's build this!
           </p>
+          {message && <ShowResult />}
           {!walletAddress && <button className="cta-button connect-wallet-button" onClick={connectWallet}>
           Connect to Wallet
           </button>}
