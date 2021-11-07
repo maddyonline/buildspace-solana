@@ -1,13 +1,28 @@
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
+import React from 'react';
 
 // Constants
 const TWITTER_HANDLE = 'madhavjha';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
+const checkIfWalletIsConnected = async () => {
+    const {solana} = window;
+    if(solana && solana.isPhantom) {
+      console.log("Phantom wallet found")
+    } else {
+      console.log("No Phantom wallet detected")
+    }
+}
 const App = () => {
-  // const [walletAddress, setWalletAddress] = React.useState(null);
-  console.log({ solana: window.solana })
+  
+  React.useEffect(() => {
+    window.addEventListener('load', async () => {
+      await checkIfWalletIsConnected();
+    })
+  }, [])
+
+
   return (
     <div className="App">
       <div className="container">
