@@ -2,12 +2,17 @@ import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import React from 'react';
 import idl from './idl.json';
+import kp from './keypair.json'
 
 import {Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
 import {Program, Provider, web3} from '@project-serum/anchor';
 
 const {SystemProgram, Keypair} = web3;
-let baseAccount = Keypair.generate();
+
+const arr = Object.values(kp._keypair.secretKey)
+const secret = new Uint8Array(arr)
+const baseAccount = web3.Keypair.fromSecretKey(secret)
+
 const programID = new PublicKey(idl.metadata.address);
 const network = clusterApiUrl('devnet');
 const opts = {
@@ -35,6 +40,7 @@ const App = () => {
   const [message, setMessage] = React.useState(null);
   const [gifList, setGifList] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
+  window.gifList = gifList;
 
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
@@ -78,12 +84,28 @@ const App = () => {
   }
 
   const sendGif = async () => {
-    if(inputValue.length > 0) {
-      console.log("Gif link:", inputValue);
-    } else {
-      console.log("Empty input, try again");
-    }
+  if (inputValue.length === 0) {
+    console.log("No gif link given!")
+    return
   }
+  console.log('Gif link:', inputValue);
+  try {
+    const provider = getProvider();
+    const program = new Program(idl, programID, provider);
+
+    await program.rpc.addGif(inputValue, {
+      accounts: {
+        baseAccount: baseAccount.publicKey,
+        user: provider.wallet.publicKey,
+      },
+    });
+    console.log("GIF successfully sent to program", inputValue)
+
+    await getGifList();
+  } catch (error) {
+    console.log("Error sending GIF:", error)
+  }
+};
 
   const renderConnectedContainer = () => {
     if (gifList === null) {
@@ -115,9 +137,9 @@ const App = () => {
       </form>
       <div className="gif-grid">
         {/* Map through gifList instead of TEST_GIFS */}
-        {gifList.map((gif) => (
-          <div className="gif-item" key={gif}>
-            <img src={gif} alt={gif} />
+        {gifList.map(({gifLink}, id ) => (
+          <div className="gif-item" key={id}>
+            <img src={gifLink} alt={gifLink} />
           </div>
         ))}
       </div>
@@ -131,6 +153,7 @@ const App = () => {
         console.log("Phantom wallet found")
         const resp = await solana.connect()
         setWalletAddress(resp.publicKey.toString())
+        await getGifList();
         setMessage({ type: "success", message: `Yay! you are connected` });
       } else {
         setMessage({ type: "error", message: "No Phantom wallet found" });
